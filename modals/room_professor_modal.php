@@ -28,16 +28,16 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form action="process_professor.php" method="POST" enctype="multipart/form-data">
+                <form method="POST" action="process_professor.php" enctype="multipart/form-data">
                     <div class="mb-3">
-                        <label class="form-label">Professor Name</label>
-                        <input type="text" class="form-control" name="name" required>
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Profile Image</label>
-                        <input type="file" class="form-control" name="profile_image" accept="image/*">
+                        <label for="profile_image" class="form-label">Profile Image</label>
+                        <input type="file" class="form-control" id="profile_image" name="profile_image" accept="image/*">
                     </div>
-                    <button type="submit" class="btn btn-primary">Save Professor</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
                 </form>
             </div>
         </div>

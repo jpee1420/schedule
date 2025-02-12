@@ -6,14 +6,15 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form action="process_schedule.php" method="POST">
+                <form id="scheduleForm" action="process_schedule.php" method="POST">
+                    <input type="hidden" name="action" value="add">
                     <div class="mb-3">
                         <label class="form-label">Subject</label>
                         <input type="text" class="form-control" name="subject" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Professor</label>
-                        <select class="form-select" name="professor_id" required>
+                        <label for="professor_id" class="form-label">Professor</label>
+                        <select name="professor_id" class="form-control" required>
                             <?php
                             $professors = getAllProfessors($conn);
                             foreach ($professors as $professor):
@@ -25,8 +26,8 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Room</label>
-                        <select class="form-select" name="room_id" required>
+                        <label for="room_id" class="form-label">Room</label>
+                        <select name="room_id" class="form-control" required>
                             <?php
                             $rooms = getAllRooms($conn);
                             foreach ($rooms as $room):
@@ -39,17 +40,17 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Start Time</label>
+                            <label for="start_time" class="form-label">Start Time</label>
                             <input type="time" class="form-control" name="start_time" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">End Time</label>
+                            <label for="end_time" class="form-label">End Time</label>
                             <input type="time" class="form-control" name="end_time" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Day</label>
-                        <select class="form-select" name="day" required>
+                        <label for="day" class="form-label">Day</label>
+                        <select name="day" class="form-control" required>
                             <option value="MWF">MWF</option>
                             <option value="TTH">TTH</option>
                             <option value="Sat">Saturday</option>
@@ -59,7 +60,7 @@
                         <label class="form-label">Notes</label>
                         <textarea class="form-control" name="notes" rows="3"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Save Schedule</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
                 </form>
             </div>
         </div>
