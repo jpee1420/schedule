@@ -71,9 +71,11 @@ require_once 'functions.php';
                                 <div class="card schedule-card">
                                     <div class="card-body">
                                         <div class="d-flex align-items-center mb-3">
-                                            <img src="uploads/<?php echo $schedule['profile_image']; ?>" 
-                                                 class="professor-image me-3" 
-                                                 alt="Professor">
+                                            <img src="<?php 
+                                                echo !empty($schedule['profile_image']) 
+                                                    ? 'uploads/' . htmlspecialchars($schedule['profile_image']) 
+                                                    : 'uploads/placeholder.png'; 
+                                            ?>" class="professor-image me-3" alt="Professor">
                                             <div>
                                                 <h5 class="card-title mb-0"><?php echo $schedule['subject']; ?></h5>
                                                 <small class="text-muted">Prof. <?php echo $schedule['professor_name']; ?></small>
@@ -93,7 +95,16 @@ require_once 'functions.php';
                                             Room <?php echo $schedule['room_name']; ?>
                                         </p>
                                         <div class="d-flex justify-content-between align-items-center mt-3">
-                                            <span class="badge bg-<?php echo $schedule['professor_status'] == 'Present' ? 'success' : 'danger'; ?>">
+                                            <?php
+                                            $badgeClass = 'success';
+                                            if ($schedule['professor_status'] === 'Absent') {
+                                                $badgeClass = 'danger';
+                                            } else if ($schedule['professor_status'] === 'On Leave') {
+                                                $badgeClass = 'warning';
+                                            }
+                                            ?>
+                                            <span class="badge bg-<?php echo $badgeClass; ?>" 
+                                                  data-professor-id="<?php echo $schedule['professor_id']; ?>">
                                                 <?php echo $schedule['professor_status']; ?>
                                             </span>
                                             <div>
@@ -193,10 +204,11 @@ require_once 'functions.php';
                                             <tr>
                                                 <td><?php echo $professor['id']; ?></td>
                                                 <td>
-                                                    <img src="uploads/<?php echo $professor['profile_image']; ?>" 
-                                                         alt="Profile" 
-                                                         class="professor-image" 
-                                                         style="width: 40px; height: 40px;">
+                                                    <img src="<?php 
+                                                        echo file_exists('uploads/' . $professor['profile_image']) 
+                                                            ? 'uploads/' . htmlspecialchars($professor['profile_image']) 
+                                                            : 'uploads/placeholder.png'; 
+                                                    ?>" class="professor-profile-image" alt="<?php echo htmlspecialchars($professor['name']); ?>">
                                                 </td>
                                                 <td><?php echo $professor['name']; ?></td>
                                                 <td>
@@ -283,9 +295,11 @@ require_once 'functions.php';
                         ?>
                         <div class="professor-status-card mb-3">
                             <div class="d-flex align-items-center">
-                                <img src="uploads/<?php echo $professor['profile_image']; ?>" 
-                                     alt="<?php echo $professor['name']; ?>"
-                                     class="professor-image-small me-2">
+                                <img src="<?php 
+                                    echo file_exists('uploads/' . $professor['profile_image']) 
+                                        ? 'uploads/' . htmlspecialchars($professor['profile_image']) 
+                                        : 'uploads/placeholder.png'; 
+                                ?>" alt="<?php echo htmlspecialchars($professor['name']); ?>" class="professor-image-small me-2">
                                 <div class="flex-grow-1">
                                     <h6 class="mb-1"><?php echo $professor['name']; ?></h6>
                                     <select class="form-select form-select-sm status-select" 

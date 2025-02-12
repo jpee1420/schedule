@@ -25,5 +25,5 @@ CREATE TABLE `schedules` (
   `end_time` time DEFAULT NULL,
   `day` enum('MWF','TTH','Sat') DEFAULT 'MWF',
   `notes` text DEFAULT NULL,
-  `professor_status` enum('Present','Absent') DEFAULT 'Present'
+  `professor_status` enum('Present','Absent', 'On Leave') DEFAULT 'Present'
 );
