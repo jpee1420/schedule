@@ -94,18 +94,64 @@ function updateProfessorStatus(professorId, status) {
         },
         body: `action=updateStatus&id=${professorId}&status=${status}`
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
-            // Refresh the schedule cards that show this professor
-            location.reload();
+            // Update the badge without reloading the page
+            const scheduleCards = document.querySelectorAll('.schedule-card');
+            scheduleCards.forEach(card => {
+                if (card.querySelector(`[data-professor-id="${professorId}"]`)) {
+                    const badge = card.querySelector('.badge');
+                    let badgeClass = 'success';
+                    if (status === 'Absent') {
+                        badgeClass = 'danger';
+                    } else if (status === 'On Leave') {
+                        badgeClass = 'warning';
+                    }
+                    badge.className = `badge bg-${badgeClass}`;
+                    badge.textContent = status;
+                }
+            });
         } else {
-            alert('Failed to update status');
+            alert(data.message || 'Failed to update status');
         }
     })
     .catch(error => {
         console.error('Error:', error);
         alert('An error occurred while updating status');
+    });
+}
+
+function validateScheduleForm(form) {
+    const formData = new FormData(form);
+    formData.append('action', 'validate'); // Add action parameter
+    
+    return fetch('process_schedule.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Server returned ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!data.success) {
+            alert(data.message || 'Schedule validation failed');
+            return false;
+        }
+        return true;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while validating the schedule');
+        return false;
     });
 }
 
@@ -131,4 +177,41 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const scheduleForm = document.querySelector('#addScheduleModal form');
+    if (scheduleForm) {
+        scheduleForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                const formData = new FormData(this);
+                const isEdit = formData.get('id') ? true : false;
+                
+                // Set the appropriate action
+                formData.set('action', isEdit ? 'edit' : 'add');
+                
+                const response = await fetch('process_schedule.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Close modal before showing alert
+                    const modal = bootstrap.Modal.getInstance(document.querySelector('#addScheduleModal'));
+                    modal.hide();
+                    
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    throw new Error(data.message || `Failed to ${isEdit ? 'edit' : 'add'} schedule`);
+                }
+            } catch (error) {
+                alert(error.message || 'An error occurred while processing the schedule');
+            }
+        });
+    }
 });
