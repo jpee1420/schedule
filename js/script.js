@@ -48,16 +48,15 @@ function editProfessor(id, name) {
     });
 }
 
-function editSchedule(id, roomId, subject, professorId, day, startTime, endTime, note, status) {
+function editSchedule(id, roomId, courseId, professorId, day, startTime, endTime) {
     editRecord('#addScheduleModal', {
         id: id,
-        subject: subject,
+        course_id: courseId,
         room_id: roomId,
         professor_id: professorId,
         start_time: startTime,
         end_time: endTime,
-        day: day,
-        notes: note
+        day: day
     });
 }
 
@@ -79,7 +78,9 @@ function deleteProfessor(id) {
 }
 
 function deleteSchedule(id) {
-    deleteRecord('process_schedule.php', id);
+    if (confirm('Are you sure you want to delete this schedule?')) {
+        window.location.href = `process_schedule.php?action=delete&id=${id}`;
+    }
 }
 
 function deleteCourse(id) {
@@ -179,38 +180,43 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+function showAlert(message, type = 'success') {
+    const alertContainer = document.getElementById('alertContainer');
+    const alertHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+    alertContainer.innerHTML = alertHTML;
+
+    // Auto-dismiss after 3 seconds
+    setTimeout(() => {
+        const alertElement = document.querySelector('.alert');
+        if (alertElement) {
+            const bsAlert = new bootstrap.Alert(alertElement);
+            bsAlert.close();
+        }
+    }, 3000);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Auto-dismiss alerts after 3 seconds
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }, 3000);
+    });
+
+    // Schedule form submission
     const scheduleForm = document.querySelector('#addScheduleModal form');
     if (scheduleForm) {
-        scheduleForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            try {
-                const formData = new FormData(this);
-                const isEdit = formData.get('id') ? true : false;
-                
-                // Set the appropriate action
-                formData.set('action', isEdit ? 'edit' : 'add');
-                
-                const response = await fetch('process_schedule.php', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Close modal before showing alert
-                    const modal = bootstrap.Modal.getInstance(document.querySelector('#addScheduleModal'));
-                    modal.hide();
-                    
-                    alert(data.message);
-                    window.location.reload();
-                } else {
-                    throw new Error(data.message || `Failed to ${isEdit ? 'edit' : 'add'} schedule`);
-                }
-            } catch (error) {
-                alert(error.message || 'An error occurred while processing the schedule');
+        scheduleForm.addEventListener('submit', function(e) {
+            const modal = bootstrap.Modal.getInstance(document.querySelector('#addScheduleModal'));
+            if (modal) {
+                modal.hide();
             }
         });
     }
