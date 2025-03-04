@@ -25,10 +25,12 @@ function getSchedules($conn) {
     $sql = "SELECT s.*, 
             p.name AS professor_name, 
             p.profile_image,
-            r.name AS room_name
+            r.name AS room_name,
+            c.course_name AS course
             FROM schedules s
             LEFT JOIN professors p ON s.professor_id = p.id
-            LEFT JOIN rooms r ON s.room_id = r.id";
+            LEFT JOIN rooms r ON s.room_id = r.id
+            LEFT JOIN courses c ON s.course_id = c.id";
             
     $result = mysqli_query($conn, $sql);
     

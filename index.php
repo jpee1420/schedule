@@ -41,17 +41,18 @@ require_once 'functions.php';
 
             <!-- Main Content -->
             <div class="col-md-8 p-4">
-                <!-- Messages -->
-                <?php if (isset($_SESSION['message'])): ?>
-                    <div class="alert alert-<?php echo $_SESSION['message_type']; ?> alert-dismissible fade show">
+                <div id="alertContainer">
+                    <?php if (isset($_SESSION['message'])): ?>
+                        <div class="alert alert-<?php echo $_SESSION['message_type']; ?> alert-dismissible fade show" role="alert">
+                            <?php echo $_SESSION['message']; ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
                         <?php 
-                        echo $_SESSION['message'];
                         unset($_SESSION['message']);
                         unset($_SESSION['message_type']);
                         ?>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                <?php endif; ?>
+                    <?php endif; ?>
+                </div>
 
                 <div class="tab-content">
                     <!-- Schedules Tab -->
@@ -62,80 +63,83 @@ require_once 'functions.php';
                                 <i class="fas fa-plus"></i> Add Schedule
                             </button>
                         </div>
-                        <div class="row">
-                            <?php
-                            $schedules = getSchedules($conn);
-                            foreach ($schedules as $schedule):
-                            ?>
-                            <div class="col-md-4 mb-4">
-                                <div class="card schedule-card">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center mb-3">
-                                            <img src="<?php 
-                                                echo !empty($schedule['profile_image']) 
-                                                    ? 'uploads/' . htmlspecialchars($schedule['profile_image']) 
-                                                    : 'uploads/placeholder.png'; 
-                                            ?>" class="professor-image me-3" alt="Professor">
-                                            <div>
-                                                <h5 class="card-title mb-0"><?php echo $schedule['subject']; ?></h5>
-                                                <small class="text-muted">Prof. <?php echo $schedule['professor_name']; ?></small>
-                                            </div>
-                                        </div>
-                                        <p class="card-text">
-                                            <i class="fas fa-clock me-2"></i>
-                                            <?php echo date('h:i A', strtotime($schedule['start_time'])); ?> - 
-                                            <?php echo date('h:i A', strtotime($schedule['end_time'])); ?>
-                                        </p>
-                                        <p class="card-text">
-                                            <i class="fas fa-calendar me-2"></i>
-                                            <?php echo $schedule['day']; ?>
-                                        </p>
-                                        <p class="card-text">
-                                            <i class="fas fa-door-open me-2"></i>
-                                            Room <?php echo $schedule['room_name']; ?>
-                                        </p>
-                                        <div class="d-flex justify-content-between align-items-center mt-3">
-                                            <?php
-                                            $badgeClass = 'success';
-                                            if ($schedule['professor_status'] === 'Absent') {
-                                                $badgeClass = 'danger';
-                                            } else if ($schedule['professor_status'] === 'On Leave') {
-                                                $badgeClass = 'warning';
-                                            }
-                                            ?>
-                                            <span class="badge bg-<?php echo $badgeClass; ?>" 
-                                                  data-professor-id="<?php echo $schedule['professor_id']; ?>">
-                                                <?php echo $schedule['professor_status']; ?>
-                                            </span>
-                                            <div>
-                                                <button class="btn btn-sm btn-primary me-2" onclick="editSchedule(
-                                                    <?php echo $schedule['id']; ?>,
-                                                    <?php echo $schedule['room_id']; ?>,
-                                                    '<?php echo $schedule['subject']; ?>',
-                                                    <?php echo $schedule['professor_id']; ?>,
-                                                    '<?php echo $schedule['day']; ?>',
-                                                    '<?php echo $schedule['start_time']; ?>',
-                                                    '<?php echo $schedule['end_time']; ?>',
-                                                    '<?php echo addslashes($schedule['notes']); ?>'
-                                                )">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-danger" onclick="deleteSchedule(<?php echo $schedule['id']; ?>)">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <?php
+                                    $schedules = getSchedules($conn);
+                                    foreach ($schedules as $schedule):
+                                    ?>
+                                    <div class="col-md-4 mb-4">
+                                        <div class="card schedule-card">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <img src="<?php 
+                                                        echo !empty($schedule['profile_image']) && $schedule['profile_image'] !== 'placeholder.png'
+                                                            ? 'uploads/' . htmlspecialchars($schedule['profile_image']) 
+                                                            : 'uploads/placeholder.png'; 
+                                                    ?>" class="professor-image me-3" alt="Professor">
+                                                    <div>
+                                                        <h5 class="card-title mb-0"><?php echo htmlspecialchars($schedule['course']); ?></h5>
+                                                        <small class="text-muted">Prof. <?php echo htmlspecialchars($schedule['professor_name']); ?></small>
+                                                    </div>
+                                                </div>
+                                                <p class="card-text">
+                                                    <i class="fas fa-clock me-2"></i>
+                                                    <?php echo date('h:i A', strtotime($schedule['start_time'])); ?> - 
+                                                    <?php echo date('h:i A', strtotime($schedule['end_time'])); ?>
+                                                </p>
+                                                <p class="card-text">
+                                                    <i class="fas fa-calendar me-2"></i>
+                                                    <?php echo $schedule['day']; ?>
+                                                </p>
+                                                <p class="card-text">
+                                                    <i class="fas fa-door-open me-2"></i>
+                                                    Room <?php echo htmlspecialchars($schedule['room_name']); ?>
+                                                </p>
+                                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                                    <?php
+                                                    $badgeClass = 'success';
+                                                    if ($schedule['professor_status'] === 'Absent') {
+                                                        $badgeClass = 'danger';
+                                                    } else if ($schedule['professor_status'] === 'On Leave') {
+                                                        $badgeClass = 'warning';
+                                                    }
+                                                    ?>
+                                                    <span class="badge bg-<?php echo $badgeClass; ?>" 
+                                                          data-professor-id="<?php echo $schedule['professor_id']; ?>">
+                                                        <?php echo $schedule['professor_status']; ?>
+                                                    </span>
+                                                    <div>
+                                                        <button class="btn btn-sm btn-primary me-2" onclick="editSchedule(
+                                                            <?php echo $schedule['id']; ?>,
+                                                            <?php echo $schedule['room_id']; ?>,
+                                                            <?php echo $schedule['course_id']; ?>,
+                                                            <?php echo $schedule['professor_id']; ?>,
+                                                            '<?php echo $schedule['day']; ?>',
+                                                            '<?php echo $schedule['start_time']; ?>',
+                                                            '<?php echo $schedule['end_time']; ?>'
+                                                        )">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger" onclick="deleteSchedule(<?php echo $schedule['id']; ?>)">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
-                            <?php endforeach; ?>
                         </div>
                     </div>
 
                     <!-- Rooms Tab -->
                     <div class="tab-pane fade" id="rooms">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h2>Rooms Management</h2>
+                            <h2>Room Management</h2>
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRoomModal">
                                 <i class="fas fa-plus"></i> Add Room
                             </button>
@@ -179,7 +183,7 @@ require_once 'functions.php';
                     <!-- Professors Tab -->
                     <div class="tab-pane fade" id="professors">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h2>Professors Management</h2>
+                            <h2>Professor Management</h2>
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProfessorModal">
                                 <i class="fas fa-plus"></i> Add Professor
                             </button>
@@ -205,7 +209,7 @@ require_once 'functions.php';
                                                 <td><?php echo $professor['id']; ?></td>
                                                 <td>
                                                     <img src="<?php 
-                                                        echo file_exists('uploads/' . $professor['profile_image']) 
+                                                        echo !empty($professor['profile_image']) && $professor['profile_image'] !== 'placeholder.png'
                                                             ? 'uploads/' . htmlspecialchars($professor['profile_image']) 
                                                             : 'uploads/placeholder.png'; 
                                                     ?>" class="professor-profile-image" alt="<?php echo htmlspecialchars($professor['name']); ?>">
@@ -231,7 +235,7 @@ require_once 'functions.php';
                     <!-- Courses Tab -->
                     <div class="tab-pane fade" id="courses">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h2>Courses Management</h2>
+                            <h2>Course Management</h2>
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCourseModal">
                                 <i class="fas fa-plus"></i> Add Course
                             </button>
@@ -296,7 +300,7 @@ require_once 'functions.php';
                         <div class="professor-status-card mb-3">
                             <div class="d-flex align-items-center">
                                 <img src="<?php 
-                                    echo file_exists('uploads/' . $professor['profile_image']) 
+                                    echo !empty($professor['profile_image']) && $professor['profile_image'] !== 'placeholder.png'
                                         ? 'uploads/' . htmlspecialchars($professor['profile_image']) 
                                         : 'uploads/placeholder.png'; 
                                 ?>" alt="<?php echo htmlspecialchars($professor['name']); ?>" class="professor-image-small me-2">
@@ -327,5 +331,17 @@ require_once 'functions.php';
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/script.js"></script>
+    <script>
+        // Auto-dismiss alerts
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 3000);
+            });
+        });
+    </script>
 </body>
 </html>
