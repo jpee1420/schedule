@@ -7,10 +7,18 @@
             </div>
             <div class="modal-body">
                 <form id="scheduleForm" action="process_schedule.php" method="POST">
-                    <input type="hidden" name="action" value="add">
                     <div class="mb-3">
-                        <label class="form-label">Subject</label>
-                        <input type="text" class="form-control" name="subject" required>
+                        <label for="course_id" class="form-label">Course</label>
+                        <select class="form-control" name="course_id" required>
+                            <?php
+                            $courses = getAllCourses($conn);
+                            foreach ($courses as $course):
+                            ?>
+                            <option value="<?php echo $course['id']; ?>">
+                                <?php echo $course['course_name']; ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="professor_id" class="form-label">Professor</label>
@@ -55,10 +63,6 @@
                             <option value="TTH">TTH</option>
                             <option value="Sat">Saturday</option>
                         </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Notes</label>
-                        <textarea class="form-control" name="notes" rows="3"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </form>
